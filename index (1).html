@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0f172a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<title>ObraCerta AI v2.0 — Engenheiro Civil Orçamentista</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-2: #273549;
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --blue: #38bdf8;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--text); padding: 14px; max-width: 880px; margin: 0 auto; padding-bottom: 70px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-badge { background: var(--accent); color: #fff; font-weight: 900; padding: 8px 11px; border-radius: 10px; font-size: 16px; }
+  h1 { font-size: 17px; font-weight: 800; }
+  .subtitle { font-size: 11px; color: var(--muted); }
+  select, input[type="text"], input[type="number"] { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 9px 11px; border-radius: 9px; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 14px; }
+  .mic-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .btn-mic { flex: 1; background: var(--red); color: #fff; border: none; padding: 13px; border-radius: 11px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-mic.listening { background: #dc2626; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+  .btn-calc { background: var(--accent); color: #fff; border: none; padding: 13px 18px; border-radius: 11px; font-size: 14px; font-weight: 800; cursor: pointer; }
+  .btn-calc:hover { background: var(--accent-hover); }
+  textarea { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 11px; font-size: 14px; resize: vertical; min-height: 70px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .chip { background: var(--card-2); color: var(--muted); border: 1px solid var(--border); padding: 5px 10px; border-radius: 999px; font-size: 11px; cursor: pointer; }
+  .chip:hover { color: #fff; border-color: var(--accent); }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+  .tab { flex: 1; min-width: 110px; background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 10px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; padding: 7px 5px; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 5px; border-bottom: 1px solid rgba(51,65,85,0.5); vertical-align: middle; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .edit-price { width: 88px; text-align: right; padding: 5px 6px; font-size: 12.5px; font-weight: 700; color: #fff; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; }
+  .total-row td { font-weight: 800; color: #fff; border-top: 2px solid var(--border); border-bottom: none; padding-top: 11px; font-size: 13.5px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 11px 8px; text-align: center; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .stat-val { font-size: 15px; font-weight: 800; }
+  .audit-box { display: flex; gap: 8px; margin-top: 8px; }
+  .badge { display: inline-block; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-top: 10px; line-height: 1.4; }
+  .badge-ok { background: rgba(16,185,129,0.18); color: var(--green); }
+  .badge-low { background: rgba(245,158,11,0.18); color: var(--yellow); }
+  .badge-high { background: rgba(239,68,68,0.18); color: var(--red); }
+  .check-row { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-bottom: 1px solid rgba(51,65,85,0.4); font-size: 13px; }
+  .check-row input[type="checkbox"] { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--accent); }
+  .add-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 6px; margin-top: 10px; }
+  .btn-sm { background: var(--card-2); color: #fff; border: 1px solid var(--border); padding: 8px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .btn-del { background: transparent; color: var(--red); border: none; font-weight: 800; cursor: pointer; padding: 4px 6px; }
+  .actions { display: flex; gap: 8px; margin-top: 14px; }
+  .btn-sec { flex: 1; background: var(--card-2); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .btn-wpp { flex: 1; background: #16a34a; color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  @media (max-width: 600px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .add-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">OC</div>
+    <div>
+      <h1>ObraCerta AI <span style="font-size:11px;color:var(--accent);">v2.0</span></h1>
+      <div class="subtitle">Orçamentista Completo • Mão de Obra &amp; Lista de Loja</div>
+    </div>
+  </div>
+  <select id="regionSelect" onchange="calcular()">
+    <option value="1.00">SP / Grande SP (Base SINAPI)</option>
+    <option value="1.06">RJ / DF / Sul</option>
+    <option value="0.92">MG / PR / Interior SP</option>
+    <option value="0.85">Nordeste / Norte / Centro-Oeste</option>
+  </select>
+</header>
+
+<div class="card">
+  <div class="mic-row">
+    <button id="micBtn" class="btn-mic" onclick="toggleMic()">🎤 Falar Obra</button>
+    <button class="btn-calc" onclick="calcular()">Calcular</button>
+  </div>
+  <textarea id="inputObra" placeholder="Fale ou digite tudo junto: Ex: 2 banheiros de 16 metros, ou 24 metros de parede, 3 portas, 1 janela e 30 metros de piso"></textarea>
+  <div class="chips">
+    <span class="chip" onclick="setExemplo('2 banheiros de 16 metros')">+ 2 banheiros (16m²)</span>
+    <span class="chip" onclick="setExemplo('24 metros de parede, 3 portas e 1 janela')">+ 24m parede + 3 portas + 1 janela</span>
+    <span class="chip" onclick="setExemplo('18 metros de teto em drywall')">+ 18m teto drywall</span>
+    <span class="chip" onclick="setExemplo('15 metros de muro com fundação e reboco')">+ 15m muro com fundação</span>
+    <span class="chip" onclick="setExemplo('40 metros de porcelanato, 40 metros de contrapiso e 12 metros de demolição')">+ Piso + contrapiso + demolição</span>
+  </div>
+</div>
+
+<div id="resultadoArea" style="display:none;">
+  <div class="summary-grid">
+    <div class="stat">
+      <div class="stat-label">Mão de Obra Estimada</div>
+      <div class="stat-val" id="resMaoObra" style="color:var(--blue);">R$ 0,00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Materiais (Loja)</div>
+      <div class="stat-val" id="resMaterial" style="color:var(--yellow);">R$ 0,00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Geral da Obra</div>
+      <div class="stat-val" id="resTotal" style="color:var(--green);">R$ 0,00</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabBtn-orc" onclick="switchTab('orc')">1. Orçamento (R$)</button>
+    <button class="tab" id="tabBtn-loja" onclick="switchTab('loja')">2. Lista de Compras</button>
+    <button class="tab" id="tabBtn-audit" onclick="switchTab('audit')">3. Auditar &amp; Conferir</button>
+  </div>
+
+  <!-- ABA 1: ORÇAMENTO DETALHADO -->
+  <div id="tab-orc">
+    <div class="card">
+      <div class="section-title">
+        <span>Mão de Obra (Toque no valor para editar)</span>
+      </div>
+      <table>
+        <thead><tr><th>Serviço</th><th>Qtd</th><th class="num">Valor (R$)</th><th></th></tr></thead>
+        <tbody id="tbMaoObra"></tbody>
+      </table>
+      <div class="add-row">
+        <input type="text" id="addMaoNome" placeholder="Add serviço extra..." />
+        <input type="text" id="addMaoQtd" placeholder="Qtd (ex: 10m²)" />
+        <input type="number" id="addMaoVal" placeholder="Valor R$" />
+        <button class="btn-sm" onclick="addExtra('mao')">+ Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <span>Materiais Estimados (Toque para editar)</span>
+      </div>
+      <table>
+        <thead><tr><th>Grupo de Material</th><th>Qtd</th><th class="num">Valor (R$)</th><th></th></tr></thead>
+        <tbody id="tbMaterial"></tbody>
+      </table>
+      <div class="add-row">
+        <input type="text" id="addMatNome" placeholder="Add material extra..." />
+        <input type="text" id="addMatQtd" placeholder="Qtd (ex: 5 un)" />
+        <input type="number" id="addMatVal" placeholder="Valor R$" />
+        <button class="btn-sm" onclick="addExtra('mat')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA 2: LISTA DE COMPRAS FÍSICA -->
+  <div id="tab-loja" style="display:none;">
+    <div class="card">
+      <div class="section-title"><span>Quantitativo Real para Pedir no Depósito</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Cálculo técnico já considerando margem de perda/quebra de 10%:</div>
+      <table>
+        <thead><tr><th>Material / Insumo</th><th class="num">Quantidade</th><th>Unidade</th></tr></thead>
+        <tbody id="tbCompras"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ABA 3: AUDITORIA E CHECKLIST -->
+  <div id="tab-audit" style="display:none;">
+    <div class="card">
+      <div class="section-title"><span>Auditar Preço Cobrado pelo Profissional</span></div>
+      <div style="font-size:12px;color:var(--muted);">Informe quanto o pedreiro cobrou para comparar com a média real da região:</div>
+      <div class="audit-box">
+        <input type="number" id="valorCobrado" placeholder="Ex: 4000" oninput="auditar()" />
+        <select id="tipoAuditoria" onchange="auditar()">
+          <option value="mao">Só Mão de Obra</option>
+          <option value="total">Mão de Obra + Material</option>
+        </select>
+      </div>
+      <div id="auditResultado"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><span>Checklist Técnico de Conferência na Obra</span></div>
+      <div id="listaAlertas"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-sec" onclick="window.print()">Salvar PDF</button>
+    <button class="btn-wpp" onclick="copiarWhatsApp()">Copiar Tudo p/ WhatsApp</button>
+  </div>
+</div>
+
+<script>
+const CATALOGO = [
+  {
+    id: 'banheiro',
+    keywords: ['banheiro', 'banheiros', 'lavabo', 'suíte', 'suite'],
+    unidade: 'm²',
+    defaultQtd: 6,
+    mao: [
+      { nome: 'Demolição de revestimento antigo e retirada de entulho', med: 45, mult: 1 },
+      { nome: 'Contrapiso com caimento + impermeabilização (box/piso)', med: 55, mult: 1 },
+      { nome: 'Assentamento de piso + azulejo até o teto + rejunte', med: 75, mult: 2.6 },
+      { nome: 'Instalação de vaso, pia/bancada, chuveiro e acessórios', med: 55, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Porcelanato/revestimento piso e parede (+10% perda)', med: 85, mult: 2.6 },
+      { nome: 'Argamassa AC3, rejunte epóxi/acrílico, cimento e areia', med: 42, mult: 2.6 },
+      { nome: 'Impermeabilizante semiflexível + tela + ralos', med: 48, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Revestimento / Porcelanato (piso + paredes)', qtd: Math.ceil(q * 2.6 * 1.1), un: 'm²' },
+      { item: 'Argamassa colante AC3 (sacos 20 kg)', qtd: Math.ceil((q * 2.6) / 3.5), un: 'sacos' },
+      { item: 'Rejunte acrílico / antimofo (potes 1 kg)', qtd: Math.ceil((q * 2.6) / 4), un: 'kg' },
+      { item: 'Cimento CP-II (sacos 50 kg - contrapiso/emboço)', qtd: Math.ceil(q * 0.45), un: 'sacos' },
+      { item: 'Areia média lavada', qtd: +(q * 0.06).toFixed(1), un: 'm³' },
+      { item: 'Impermeabilizante (caixa 18 kg / galão)', qtd: Math.max(1, Math.ceil(q / 8)), un: 'cx/galão' },
+      { item: 'Caçamba estacionária de entulho (4 m³)', qtd: Math.max(1, Math.ceil(q / 12)), un: 'un' }
+    ],
+    alerta: 'Banheiro completo exige impermeabilização no piso e 1,50m na área do box, além de teste de caimento de água antes de rejuntar.'
+  },
+  {
+    id: 'cozinha',
+    keywords: ['cozinha', 'cozinhas', 'lavanderia', 'área de serviço', 'area de servico'],
+    unidade: 'm²',
+    defaultQtd: 10,
+    mao: [
+      { nome: 'Demolição de revestimento antigo e preparo de base', med: 40, mult: 1 },
+      { nome: 'Assentamento de piso + revestimento parede hidráulica', med: 70, mult: 2.0 },
+      { nome: 'Instalação de pia/bancada, tanque e pontos hidráulicos', med: 45, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Piso e revestimento de parede (+10% perda)', med: 80, mult: 2.0 },
+      { nome: 'Argamassa AC3, rejunte e insumos de instalação', med: 38, mult: 2.0 }
+    ],
+    compras: (q) => [
+      { item: 'Piso + Azulejo de parede (com 10% perda)', qtd: Math.ceil(q * 2.0 * 1.1), un: 'm²' },
+      { item: 'Argamassa colante AC3 (sacos 20 kg)', qtd: Math.ceil((q * 2.0) / 3.5), un: 'sacos' },
+      { item: 'Rejunte (kg)', qtd: Math.ceil((q * 2.0) / 4), un: 'kg' }
+    ],
+    alerta: 'Confirme se os pontos de esgoto (50mm para pia/máquina) e água fria/quente já estão na altura certa da bancada antes de azulejar.'
+  },
+  {
+    id: 'parede',
+    keywords: ['parede', 'alvenaria', 'tijolo', 'bloco'],
+    unidade: 'm²',
+    defaultQtd: 10,
+    mao: [
+      { nome: 'Levante de parede (bloco cerâmico ou concreto)', med: 62, mult: 1 },
+      { nome: 'Chapisco + reboco desempenado (2 faces da parede)', med: 50, mult: 2 }
+    ],
+    mat: [
+      { nome: 'Blocos, cimento, areia e cal/aditivo (levante)', med: 52, mult: 1 },
+      { nome: 'Cimento, areia fina e cal para reboco (2 lados)', med: 30, mult: 2 }
+    ],
+    compras: (q) => [
+      { item: 'Blocos cerâmicos (14x19x29 cm + 10% perda)', qtd: Math.ceil(q * 25), un: 'un' },
+      { item: 'Cimento CP-II (sacos 50 kg - assentamento + reboco)', qtd: Math.ceil(q * 0.55), un: 'sacos' },
+      { item: 'Areia média/fina lavada', qtd: +(q * 0.08).toFixed(1), un: 'm³' },
+      { item: 'Cal hidratada (sacos 20 kg) ou plastificante', qtd: Math.ceil(q * 0.45), un: 'sacos' }
+    ],
+    alerta: 'Parede de alvenaria gera o dobro de metragem de reboco (frente e verso). Exija amarração com ferro na parede existente a cada 3 fiadas.'
+  },
+  {
+    id: 'muro',
+    keywords: ['muro', 'muros', 'baldrame'],
+    unidade: 'm²',
+    defaultQtd: 15,
+    mao: [
+      { nome: 'Escavação de brocas, viga baldrame e colunas', med: 65, mult: 1 },
+      { nome: 'Levante de muro + chapisco/reboco nos 2 lados', med: 110, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Blocos de concreto/cerâmico, ferro, brita, cimento e areia', med: 135, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Blocos de concreto (14x19x39 cm + 10% perda)', qtd: Math.ceil(q * 14), un: 'un' },
+      { item: 'Cimento CP-II (sacos 50 kg - fundação + muro)', qtd: Math.ceil(q * 0.85), un: 'sacos' },
+      { item: 'Areia média lavada', qtd: +(q * 0.11).toFixed(1), un: 'm³' },
+      { item: 'Pedra brita nº 1 (fundação e colunas)', qtd: +(q * 0.06).toFixed(1), un: 'm³' },
+      { item: 'Ferragem armada (colunas/baldrame 5/16")', qtd: Math.ceil(q * 1.4), un: 'metros' }
+    ],
+    alerta: 'Muro sem broca/fundação e sem coluna a cada 2,5m a 3m cai com vento forte. Exija impermeabilização na viga baldrame para não subir umidade.'
+  },
+  {
+    id: 'laje',
+    keywords: ['laje', 'lajes', 'batida de laje'],
+    unidade: 'm²',
+    defaultQtd: 20,
+    mao: [
+      { nome: 'Escoramento, montagem de vigotas/lajotas, ferragem e concretagem', med: 85, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Kit laje treliçada + malha pop + concreto usinado/virado', med: 145, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Laje pré-moldada (vigotas + lajotas/EPS)', qtd: Math.ceil(q), un: 'm²' },
+      { item: 'Malha POP soldada (painéis 2x3m)', qtd: Math.ceil((q * 1.1) / 6), un: 'painéis' },
+      { item: 'Concreto (capa de 5cm a 6cm)', qtd: +(q * 0.07).toFixed(1), un: 'm³' }
+    ],
+    alerta: 'Exija escoramento firme por no mínimo 21 dias e molhar a laje nos primeiros 7 dias (cura do concreto) para evitar trincas.'
+  },
+  {
+    id: 'contrapiso',
+    keywords: ['contrapiso', 'regularização', 'regularizacao', 'nivelamento'],
+    unidade: 'm²',
+    defaultQtd: 20,
+    mao: [
+      { nome: 'Execução de contrapiso sarrafeado e nivelado (3 a 5 cm)', med: 38, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Cimento e areia grossa/média para farofa de contrapiso', med: 26, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Cimento CP-II (sacos 50 kg)', qtd: Math.ceil(q * 0.35), un: 'sacos' },
+      { item: 'Areia média/grossa lavada', qtd: +(q * 0.05).toFixed(1), un: 'm³' }
+    ],
+    alerta: 'Peça para o pedreiro bater o nível a laser/mangueira em todo o ambiente antes de puxar a massa, garantindo que portas não raspem.'
+  },
+  {
+    id: 'piso',
+    keywords: ['piso', 'porcelanato', 'cerâmica', 'ceramica', 'azulejo', 'revestimento', 'rodapé', 'rodape'],
+    unidade: 'm²',
+    defaultQtd: 20,
+    mao: [
+      { nome: 'Assentamento de piso/porcelanato + rodapé + rejunte', med: 72, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Piso/porcelanato + argamassa AC3 + rejunte (+10% perda)', med: 105, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Piso / Porcelanato (já com +10% para recortes)', qtd: Math.ceil(q * 1.1), un: 'm²' },
+      { item: 'Argamassa colante AC3 (sacos 20 kg)', qtd: Math.ceil(q / 3.5), un: 'sacos' },
+      { item: 'Rejunte acrílico/cimentício (kg)', qtd: Math.ceil(q / 4), un: 'kg' },
+      { item: 'Espaçadores / niveladores de piso (pacote 100 un)', qtd: Math.ceil(q / 10), un: 'pcts' }
+    ],
+    alerta: 'Peças de porcelanato acima de 60x60 cm exigem dupla colagem (argamassa no chão e no verso da peça) para não ficarem ocas.'
+  },
+  {
+    id: 'reboco',
+    keywords: ['reboco', 'emboço', 'emboco', 'chapisco'],
+    unidade: 'm²',
+    defaultQtd: 20,
+    mao: [
+      { nome: 'Chapisco + reboco desempenado no prumo', med: 50, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Cimento, areia fina e cal/aditivo plastificante', med: 30, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Cimento CP-II (sacos 50 kg)', qtd: Math.ceil(q * 0.22), un: 'sacos' },
+      { item: 'Areia fina lavada', qtd: +(q * 0.03).toFixed(1), un: 'm³' },
+      { item: 'Cal hidratada (sacos 20 kg)', qtd: Math.ceil(q * 0.2), un: 'sacos' }
+    ],
+    alerta: 'Verifique se o pedreiro vai fazer mestras de prumo antes de sarrafear para a parede não ficar torta.'
+  },
+  {
+    id: 'demolicao',
+    keywords: ['demolição', 'demolicao', 'demolir', 'quebrar', 'entulho', 'retirada'],
+    unidade: 'm²',
+    defaultQtd: 10,
+    mao: [
+      { nome: 'Demolição manual e ensacamento/carregamento de entulho', med: 48, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Locação de caçamba estacionária (4 m³) + sacos de ráfia', med: 45, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Caçamba estacionária de entulho (4 m³)', qtd: Math.max(1, Math.ceil(q / 12)), un: 'un' },
+      { item: 'Sacos de ráfia reforçados para entulho', qtd: Math.ceil(q * 3), un: 'un' }
+    ],
+    alerta: 'Nunca quebre parede sem antes verificar se passa conduíte elétrico, cano de água ou se é parede estrutural.'
+  },
+  {
+    id: 'impermeabilizacao',
+    keywords: ['impermeabilização', 'impermeabilizacao', 'impermeabilizar', 'manta', 'infiltração', 'infiltracao'],
+    unidade: 'm²',
+    defaultQtd: 15,
+    mao: [
+      { nome: 'Limpeza, regularização e aplicação de impermeabilizante/manta', med: 45, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Impermeabilizante polimérico/manta asfáltica + primer + tela', med: 55, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Impermeabilizante (caixa 18 kg ou balde 18 L)', qtd: Math.max(1, Math.ceil(q / 7)), un: 'un' },
+      { item: 'Tela de poliéster para reforço de cantos/ralos', qtd: Math.ceil(q * 0.5), un: 'metros' }
+    ],
+    alerta: 'Aplique no mínimo 3 demãos cruzadas respeitando o tempo de secagem entre elas e faça teste de lâmina d’água por 48h.'
+  },
+  {
+    id: 'drywall',
+    keywords: ['drywall', 'gesso', 'forro', 'teto', 'sanca'],
+    unidade: 'm²',
+    defaultQtd: 18,
+    mao: [
+      { nome: 'Montagem estrutura F530 + chapas + fita e massa nas juntas', med: 58, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Chapas ST, perfis F530, tabica, tirantes, parafusos e massa', med: 54, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Chapas de Drywall ST (1,20 x 1,80 m)', qtd: Math.ceil((q * 1.1) / 2.16), un: 'chapas' },
+      { item: 'Perfis metálicos F530 (barras 3 m)', qtd: Math.ceil(q * 0.7), un: 'barras' },
+      { item: 'Massa para juntas drywall (balde 15 kg)', qtd: Math.max(1, Math.ceil(q / 25)), un: 'baldes' },
+      { item: 'Fita de papel/telada para juntas (rolo)', qtd: Math.max(1, Math.ceil(q / 30)), un: 'rolos' }
+    ],
+    alerta: 'Exija perfis a cada 60 cm (evita embarrigar) e tabica metálica nas bordas (evita trincas). Pintura não inclusa.'
+  },
+  {
+    id: 'porta',
+    keywords: ['porta', 'portas', 'batente'],
+    unidade: 'un',
+    defaultQtd: 1,
+    mao: [
+      { nome: 'Instalação completa de porta (batente, folha, fechadura e alisar)', med: 320, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Kit porta pronta/madeira + verga de concreto + espuma PU', med: 780, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Kit porta completo (folha, batente, guarnição, fechadura)', qtd: Math.ceil(q), un: 'kits' },
+      { item: 'Espuma expansiva PU (tubo 500 ml)', qtd: Math.ceil(q * 1.2), un: 'tubos' }
+    ],
+    alerta: 'Exija verga de concreto armada acima do vão da porta e confirme se a instalação inclui fechadura e guarnições.'
+  },
+  {
+    id: 'janela',
+    keywords: ['janela', 'janelas', 'vitrô', 'vitro', 'basculante'],
+    unidade: 'un',
+    defaultQtd: 1,
+    mao: [
+      { nome: 'Chumbamento, prumo, nível e requadro de janela', med: 270, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Janela padrão (alumínio/vidro) + verga e contraverga', med: 980, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Janela / Vitrô conforme medida do vão', qtd: Math.ceil(q), un: 'un' },
+      { item: 'Selante PU para vedação externa (bisnaga)', qtd: Math.ceil(q), un: 'un' }
+    ],
+    alerta: 'Toda janela exige contraverga na parte inferior (passando 30 cm para cada lado) para não rachar nos cantos.'
+  },
+  {
+    id: 'pintura',
+    keywords: ['pintura', 'pintar', 'tinta', 'massa corrida', 'textura'],
+    unidade: 'm²',
+    defaultQtd: 30,
+    mao: [
+      { nome: 'Lixamento, selador, 2 demãos massa corrida + 2 de tinta', med: 34, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Tinta acrílica premium, selador, massa corrida e lixas', med: 24, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Tinta acrílica (lata 18 L - rende ~90m²/demão)', qtd: Math.max(1, Math.ceil((q * 2.2) / 90)), un: 'latas 18L' },
+      { item: 'Massa corrida / acrílica (lata 25 kg)', qtd: Math.max(1, Math.ceil(q / 30)), un: 'latas 25kg' },
+      { item: 'Selador acrílico (lata 18 L)', qtd: Math.max(1, Math.ceil(q / 100)), un: 'latas 18L' }
+    ],
+    alerta: 'Em reboco novo, aguarde 28 dias de cura ou use fundo preparador para a tinta não descascar ou manchar.'
+  },
+  {
+    id: 'ponto',
+    keywords: ['ponto', 'pontos', 'tomada', 'tomadas', 'hidráulica', 'hidraulica', 'elétrica', 'eletrica', 'cano'],
+    unidade: 'pt',
+    defaultQtd: 4,
+    mao: [
+      { nome: 'Rasgo na parede, tubulação/conduíte, caixinha e chumbamento', med: 140, mult: 1 }
+    ],
+    mat: [
+      { nome: 'Tubos PVC/conduítes, conexões, fios/caixinhas e argamassa', med: 85, mult: 1 }
+    ],
+    compras: (q) => [
+      { item: 'Caixinhas 4x2 / Conexões hidráulicas (joelhos/tês)', qtd: Math.ceil(q * 2), un: 'un' },
+      { item: 'Tubos PVC / Eletroduto corrugado (metros)', qtd: Math.ceil(q * 4), un: 'metros' }
+    ],
+    alerta: 'Tire foto de todas as paredes com os canos e eletrodutos antes de fechar o reboco para não furar nenhum cano no futuro.'
+  }
+];
+
+const EXTENSO = {
+  'um': 1, 'uma': 1, 'dois': 2, 'duas': 2, 'tres': 3, 'três': 3,
+  'quatro': 4, 'cinco': 5, 'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9, 'dez': 10,
+  'quinze': 15, 'vinte': 20, 'trinta': 30, 'quarenta': 40, 'cinquenta': 50
+};
+
+let itensMao = [];
+let itensMat = [];
+let listaCompras = [];
+let alertasAtivos = [];
+
+function fmt(v) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function setExemplo(txt) {
+  document.getElementById('inputObra').value = txt;
+  calcular();
+}
+
+function switchTab(id) {
+  ['orc', 'loja', 'audit'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === id ? 'block' : 'none';
+    document.getElementById('tabBtn-' + t).classList.toggle('active', t === id);
+  });
+}
+
+function normalizarNumeros(texto) {
+  let t = texto.toLowerCase();
+  for (const [k, v] of Object.entries(EXTENSO)) {
+    t = t.replace(new RegExp('\\b' + k + '\\b', 'g'), v);
+  }
+  return t;
+}
+
+function calcular() {
+  const raw = document.getElementById('inputObra').value.trim();
+  if (!raw) return;
+
+  const fator = parseFloat(document.getElementById('regionSelect').value);
+  const texto = normalizarNumeros(raw);
+
+  const blocos = texto.split(/,|;|\+|\be\b|\n/).map(s => s.trim()).filter(Boolean);
+  const encontrados = [];
+
+  blocos.forEach(bloco => {
+    const nums = bloco.match(/\d+(?:[.,]\d+)?/g);
+    let itemAchado = null;
+
+    for (const item of CATALOGO) {
+      if (item.keywords.some(kw => bloco.includes(kw))) {
+        itemAchado = item;
+        break;
+      }
+    }
+
+    if (itemAchado) {
+      let qtdFinal = itemAchado.defaultQtd;
+      if (nums && nums.length > 0) {
+        const valores = nums.map(n => parseFloat(n.replace(',', '.')));
+        if (['banheiro', 'cozinha'].includes(itemAchado.id) && valores.length >= 2) {
+          qtdFinal = Math.max(...valores);
+        } else {
+          qtdFinal = valores[0];
+        }
+      }
+      encontrados.push({ item: itemAchado, qtd: qtdFinal });
+    }
+  });
+
+  if (encontrados.length === 0) {
+    alert('Não identifiquei os serviços. Tente falar a metragem ou quantidade e o serviço, ex: "2 banheiros de 16 metros" ou "24 metros de parede e 3 portas".');
+    return;
+  }
+
+  itensMao = [];
+  itensMat = [];
+  const comprasMap = {};
+  const alertasSet = new Set();
+
+  encontrados.forEach(({ item, qtd }) => {
+    item.mao.forEach(m => {
+      const qEf = +(qtd * m.mult).toFixed(1);
+      itensMao.push({
+        nome: m.nome,
+        qtdStr: `${qEf} ${item.unidade}`,
+        valor: Math.round(qEf * m.med * fator)
+      });
+    });
+
+    item.mat.forEach(m => {
+      const qEf = +(qtd * m.mult).toFixed(1);
+      itensMat.push({
+        nome: m.nome,
+        qtdStr: `${qEf} ${item.unidade}`,
+        valor: Math.round(qEf * m.med * fator)
+      });
+    });
+
+    if (item.compras) {
+      item.compras(qtd).forEach(c => {
+        const key = c.item + '|' + c.un;
+        if (!comprasMap[key]) comprasMap[key] = { item: c.item, qtd: 0, un: c.un };
+        comprasMap[key].qtd = +(comprasMap[key].qtd + c.qtd).toFixed(1);
+      });
+    }
+
+    alertasSet.add(item.alerta);
+  });
+
+  listaCompras = Object.values(comprasMap);
+  alertasAtivos = Array.from(alertasSet);
+
+  renderizarTudo();
+  document.getElementById('resultadoArea').style.display = 'block';
+}
+
+function renderizarTudo() {
+  let totalMao = 0;
+  let htmlMao = '';
+  itensMao.forEach((it, idx) => {
+    totalMao += it.valor;
+    htmlMao += `<tr>
+      <td>${it.nome}</td>
+      <td>${it.qtdStr}</td>
+      <td class="num"><input class="edit-price" type="number" value="${it.valor}" onchange="atualizarValor('mao', ${idx}, this.value)" /></td>
+      <td><button class="btn-del" onclick="removerItem('mao', ${idx})">✕</button></td>
+    </tr>`;
+  });
+  htmlMao += `<tr class="total-row"><td colspan="2">SUBTOTAL MÃO DE OBRA</td><td class="num">${fmt(totalMao)}</td><td></td></tr>`;
+  document.getElementById('tbMaoObra').innerHTML = htmlMao;
+
+  let totalMat = 0;
+  let htmlMat = '';
+  itensMat.forEach((it, idx) => {
+    totalMat += it.valor;
+    htmlMat += `<tr>
+      <td>${it.nome}</td>
+      <td>${it.qtdStr}</td>
+      <td class="num"><input class="edit-price" type="number" value="${it.valor}" onchange="atualizarValor('mat', ${idx}, this.value)" /></td>
+      <td><button class="btn-del" onclick="removerItem('mat', ${idx})">✕</button></td>
+    </tr>`;
+  });
+  htmlMat += `<tr class="total-row"><td colspan="2">SUBTOTAL MATERIAIS</td><td class="num">${fmt(totalMat)}</td><td></td></tr>`;
+  document.getElementById('tbMaterial').innerHTML = htmlMat;
+
+  document.getElementById('resMaoObra').textContent = fmt(totalMao);
+  document.getElementById('resMaterial').textContent = fmt(totalMat);
+  document.getElementById('resTotal').textContent = fmt(totalMao + totalMat);
+
+  let htmlCompras = '';
+  listaCompras.forEach(c => {
+    htmlCompras += `<tr><td>${c.item}</td><td class="num" style="font-weight:800;color:var(--yellow);">${c.qtd}</td><td>${c.un}</td></tr>`;
+  });
+  document.getElementById('tbCompras').innerHTML = htmlCompras || '<tr><td colspan="3">Nenhum insumo calculado.</td></tr>';
+
+  let htmlAlertas = '';
+  alertasAtivos.forEach((a, i) => {
+    htmlAlertas += `<label class="check-row"><input type="checkbox" id="chk_${i}" /><span>${a}</span></label>`;
+  });
+  document.getElementById('listaAlertas').innerHTML = htmlAlertas;
+
+  auditar();
+}
+
+function atualizarValor(tipo, idx, novoVal) {
+  const v = parseFloat(novoVal) || 0;
+  if (tipo === 'mao') itensMao[idx].valor = v;
+  else itensMat[idx].valor = v;
+  renderizarTudo();
+}
+
+function removerItem(tipo, idx) {
+  if (tipo === 'mao') itensMao.splice(idx, 1);
+  else itensMat.splice(idx, 1);
+  renderizarTudo();
+}
+
+function addExtra(tipo) {
+  if (tipo === 'mao') {
+    const nome = document.getElementById('addMaoNome').value.trim();
+    const qtd = document.getElementById('addMaoQtd').value.trim() || '1 un';
+    const val = parseFloat(document.getElementById('addMaoVal').value) || 0;
+    if (!nome) return;
+    itensMao.push({ nome, qtdStr: qtd, valor: val });
+    document.getElementById('addMaoNome').value = '';
+    document.getElementById('addMaoQtd').value = '';
+    document.getElementById('addMaoVal').value = '';
+  } else {
+    const nome = document.getElementById('addMatNome').value.trim();
+    const qtd = document.getElementById('addMatQtd').value.trim() || '1 un';
+    const val = parseFloat(document.getElementById('addMatVal').value) || 0;
+    if (!nome) return;
+    itensMat.push({ nome, qtdStr: qtd, valor: val });
+    document.getElementById('addMatNome').value = '';
+    document.getElementById('addMatQtd').value = '';
+    document.getElementById('addMatVal').value = '';
+  }
+  renderizarTudo();
+}
+
+function auditar() {
+  const cobrado = parseFloat(document.getElementById('valorCobrado').value);
+  const tipo = document.getElementById('tipoAuditoria').value;
+  const out = document.getElementById('auditResultado');
+  if (!cobrado || cobrado <= 0) { out.innerHTML = ''; return; }
+
+  const totalMao = itensMao.reduce((s, x) => s + x.valor, 0);
+  const totalMat = itensMat.reduce((s, x) => s + x.valor, 0);
+  const ref = tipo === 'mao' ? totalMao : (totalMao + totalMat);
+
+  if (cobrado < ref * 0.82) {
+    out.innerHTML = `<div class="badge badge-low">⚠️ ABAIXO DA MÉDIA (${fmt(ref)} estimado) — Cuidado! Confira se inclui demolição, reboco e acabamento.</div>`;
+  } else if (cobrado <= ref * 1.18) {
+    out.innerHTML = `<div class="badge badge-ok">✅ DENTRO DA MÉDIA (${fmt(ref)} estimado) — Preço justo e compatível com o mercado.</div>`;
+  } else {
+    const diff = cobrado - ref;
+    out.innerHTML = `<div class="badge badge-high">🚨 ACIMA DA MÉDIA (${fmt(ref)} estimado) — Está cerca de ${fmt(diff)} acima do padrão.</div>`;
+  }
+}
+
+function copiarWhatsApp() {
+  const totalMao = itensMao.reduce((s, x) => s + x.valor, 0);
+  const totalMat = itensMat.reduce((s, x) => s + x.valor, 0);
+  const linhas = ['*ORÇAMENTO DE OBRA — OBRACERTA AI*', '', '*1. MÃO DE OBRA:*'];
+  itensMao.forEach(m => linhas.push(`• ${m.nome} (${m.qtdStr}): ${fmt(m.valor)}`));
+  linhas.push(`*Subtotal Mão de Obra: ${fmt(totalMao)}*`, '', '*2. MATERIAIS ESTIMADOS:*');
+  itensMat.forEach(m => linhas.push(`• ${m.nome} (${m.qtdStr}): ${fmt(m.valor)}`));
+  linhas.push(`*Subtotal Materiais: ${fmt(totalMat)}*`, '', `*TOTAL GERAL ESTIMADO: ${fmt(totalMao + totalMat)}*`);
+
+  if (listaCompras.length > 0) {
+    linhas.push('', '*3. LISTA DE COMPRAS (DEPÓSITO):*');
+    listaCompras.forEach(c => linhas.push(`- ${c.item}: *${c.qtd} ${c.un}*`));
+  }
+
+  navigator.clipboard.writeText(linhas.join('\n')).then(() => {
+    alert('Orçamento completo e lista de compras copiados para o WhatsApp!');
+  });
+}
+
+let recognition = null;
+let listening = false;
+
+function toggleMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Toque na caixa de texto abaixo e use o microfone do teclado do seu celular para ditar.');
+    return;
+  }
+  if (!recognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.onresult = (e) => {
+      document.getElementById('inputObra').value = e.results[0][0].transcript;
+      calcular();
+    };
+    recognition.onend = () => {
+      listening = false;
+      const btn = document.getElementById('micBtn');
+      btn.classList.remove('listening');
+      btn.textContent = '🎤 Falar Obra';
+    };
+  }
+  if (listening) recognition.stop();
+  else {
+    listening = true;
+    const btn = document.getElementById('micBtn');
+    btn.classList.add('listening');
+    btn.textContent = '🔴 Ouvindo... Fale agora';
+    recognition.start();
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
